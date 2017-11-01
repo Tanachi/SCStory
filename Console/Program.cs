@@ -19,7 +19,7 @@ namespace SCStory
                (System.IO.Directory.GetParent(Environment.CurrentDirectory)
                .ToString()).ToString();
             string userid = "";
-            string passwd = "";
+            string passwd = null; 
             string url = "";
             SharpCloudApi sc = null;
             Story story = null;
@@ -30,13 +30,7 @@ namespace SCStory
                 Console.WriteLine("Please enter your Sharpcloud Username");
                 userid = Console.ReadLine();
                 Console.WriteLine("Please enter your password(Press Enter to finish password)");
-                while (true)
-                {
-                    var key = System.Console.ReadKey(true);
-                    if (key.Key == ConsoleKey.Enter)
-                        break;
-                    passwd += key.KeyChar;
-                }
+                passwd = GetConsolePassword();
                 try
                 {
                     sc = new SharpCloudApi(userid, passwd);
@@ -47,6 +41,7 @@ namespace SCStory
                 catch(SystemException e)
                 {
                     Console.WriteLine("Incorrect Username or Password");
+                    passwd = null;
                 }
             }
            
@@ -240,5 +235,35 @@ namespace SCStory
             // Writes file to disk
             Console.WriteLine("ItemSheet Written");
         }
+        private static string GetConsolePassword()
+        {
+            StringBuilder sb = new StringBuilder();
+            while (true)
+            {
+                ConsoleKeyInfo cki = Console.ReadKey(true);
+                if (cki.Key == ConsoleKey.Enter)
+                {
+                    Console.WriteLine();
+                    break;
+                }
+
+                if (cki.Key == ConsoleKey.Backspace)
+                {
+                    if (sb.Length > 0)
+                    {
+                        Console.Write("\b\0\b");
+                        sb.Length--;
+                    }
+
+                    continue;
+                }
+
+                Console.Write('*');
+                sb.Append(cki.KeyChar);
+            }
+
+            return sb.ToString();
+        }
+
     }
 }
